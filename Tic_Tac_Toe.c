@@ -178,8 +178,6 @@ void on_clicked_button(
 
 
   if (winning_player != ' ') {
-      // g_print("%c player wins\n",winning_player);
-
       char state = *current_player;
       char *str;
 
@@ -254,11 +252,16 @@ void on_clicked_button(
   }
 }
 
+void reset_clicked(GtkWidget *widget, void* nothing){
+    g_print("Test\n");
+}
+
 int main(int argc, char* argv[]) {
     GtkBuilder *builder;
     GtkWidget *window;
     GtkWidget *buttons[3][3];
     GtkWidget *player_label;
+    GtkWidget *reset_button;
 
     char game_state[3][3];
     int i;
@@ -291,6 +294,7 @@ int main(int argc, char* argv[]) {
     buttons[2][1] = GTK_WIDGET(gtk_builder_get_object(builder, "button_2_1"));
     buttons[2][2] = GTK_WIDGET(gtk_builder_get_object(builder, "button_2_2"));
     player_label = GTK_WIDGET(gtk_builder_get_object(builder, "player_label"));
+    reset_button = GTK_WIDGET(gtk_builder_get_object(builder, "reset_button"));
 
     struct button_press_arguments arguments[3][3] = {};
 
@@ -310,6 +314,22 @@ int main(int argc, char* argv[]) {
                             );
        }
     }
+
+g_signal_connect(reset_button,
+                 "clicked",
+                 G_CALLBACK(reset_clicked),
+                 NULL
+                );
+
+// char *str = g_strdup_printf ("<span font=\"20\">"
+//                              "<b>%s</b>"
+//                              "</span>",
+//                              "O");
+//
+// GtkButton *button = (GtkButton*) &reset_button;
+// GtkLabel *button_label = (GtkLabel*) gtk_bin_get_child(GTK_BIN(button));
+// gtk_label_set_markup (GTK_LABEL (button_label), str);
+// g_free (str); // remember to free the string allocated by g_strdup_printf()
 
     // Show and start main loop
     gtk_widget_show_all(window);
