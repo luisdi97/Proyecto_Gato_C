@@ -3,7 +3,7 @@
 
 struct button_press_arguments {
     GtkWidget *player_label;
-    GtkWidget *button;
+    GtkWidget *((*buttons)[3]);
     char (*game_state_pointer)[3];
     char *current_player;
     int i;
@@ -62,8 +62,10 @@ void on_clicked_button(
     *current_player = 'X';
 
   }
+    GtkWidget *((*buttons)[3]);
+    buttons = arguments->buttons;
 
-    GtkButton *button = (GtkButton*) arguments->button;
+    GtkButton *button = (GtkButton*) *(*(buttons + i) + j);
     GtkLabel *button_label = (GtkLabel*) gtk_bin_get_child(GTK_BIN(button));
     gtk_label_set_markup (GTK_LABEL (button_label), str);
     g_free (str); // remember to free the string allocated by g_strdup_printf()
@@ -116,7 +118,7 @@ int main(int argc, char* argv[]) {
     for (i = 0; i < 3; i++) {
        for (j = 0; j < 3; j++) {
             arguments[i][j].player_label = player_label;
-            arguments[i][j].button = buttons[i][j];
+            arguments[i][j].buttons = buttons;
             arguments[i][j].game_state_pointer = game_state;
             arguments[i][j].current_player = &current_player;
             arguments[i][j].i = i;
