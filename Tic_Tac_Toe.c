@@ -1,33 +1,59 @@
 #include <gtk/gtk.h>
 
 
-void on_clicked_button(GtkWidget *widget, gpointer button_data) {
-  char *str = g_strdup_printf ("<span font=\"90\" color=\"red\">"
-                             "<b>%s</b>"
-                           "</span>",
-                           "X");
+struct button_press_arguments {
+    GtkWidget *button;
+    int *state_pointer;
+};
 
-    GtkButton *button = (GtkButton*) button_data;
+void on_clicked_button(
+                       GtkWidget *widget,
+                       struct button_press_arguments *arguments
+                      )
+{
+  enum state_definition {
+      NO_CLICK,  // 0
+      CLICK      // 1
+  };
+
+  char *str = g_strdup_printf ("<span font=\"90\" color=\"red\">"
+                               "<b>%s</b>"
+                               "</span>",
+                               "X");
+
+    int *state_pointer = arguments->state_pointer;
+    *state_pointer = CLICK;
+    GtkButton *button = (GtkButton*) arguments->button;
     GtkLabel *label = (GtkLabel*) gtk_bin_get_child(GTK_BIN(button));
     gtk_label_set_text(label, "X");
     gtk_label_set_markup (GTK_LABEL (label), str);
     g_free (str); // remember to free the string allocated by g_strdup_printf()
-    // g_print("X\n");
+    gboolean sensitive= FALSE;
+    gtk_widget_set_sensitive(widget, sensitive);
+
+    // g_print("%d\n",CLICK);
 }
 
 int main(int argc, char* argv[]) {
     GtkBuilder *builder;
     GtkWidget *window;
-    GtkWidget *button_0_0;
-    GtkWidget *button_0_1;
-    GtkWidget *button_0_2;
-    GtkWidget *button_1_0;
-    GtkWidget *button_1_1;
-    GtkWidget *button_1_2;
-    GtkWidget *button_2_0;
-    GtkWidget *button_2_1;
-    GtkWidget *button_2_2;
+    GtkWidget *buttons[3][3];
     GtkWidget *player_label;
+
+    enum state_definition {
+        NO_CLICK,  // 0
+        CLICK      // 1
+    };
+
+    int game_state[3][3];
+    int i;
+    int j;
+
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            game_state[i][j] = NO_CLICK;
+        }
+    }
 
     gtk_init(&argc, &argv);
 
@@ -38,79 +64,31 @@ int main(int argc, char* argv[]) {
     window = GTK_WIDGET(gtk_builder_get_object(builder, "main_window"));
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
-    button_0_0 = GTK_WIDGET(gtk_builder_get_object(builder, "button_0_0"));
-    button_0_1 = GTK_WIDGET(gtk_builder_get_object(builder, "button_0_1"));
-    button_0_2 = GTK_WIDGET(gtk_builder_get_object(builder, "button_0_2"));
-    button_1_0 = GTK_WIDGET(gtk_builder_get_object(builder, "button_1_0"));
-    button_1_1 = GTK_WIDGET(gtk_builder_get_object(builder, "button_1_1"));
-    button_1_2 = GTK_WIDGET(gtk_builder_get_object(builder, "button_1_2"));
-    button_2_0 = GTK_WIDGET(gtk_builder_get_object(builder, "button_2_0"));
-    button_2_1 = GTK_WIDGET(gtk_builder_get_object(builder, "button_2_1"));
-    button_2_2 = GTK_WIDGET(gtk_builder_get_object(builder, "button_2_2"));
+    buttons[0][0] = GTK_WIDGET(gtk_builder_get_object(builder, "button_0_0"));
+    buttons[0][1] = GTK_WIDGET(gtk_builder_get_object(builder, "button_0_1"));
+    buttons[0][2] = GTK_WIDGET(gtk_builder_get_object(builder, "button_0_2"));
+    buttons[1][0] = GTK_WIDGET(gtk_builder_get_object(builder, "button_1_0"));
+    buttons[1][1] = GTK_WIDGET(gtk_builder_get_object(builder, "button_1_1"));
+    buttons[1][2] = GTK_WIDGET(gtk_builder_get_object(builder, "button_1_2"));
+    buttons[2][0] = GTK_WIDGET(gtk_builder_get_object(builder, "button_2_0"));
+    buttons[2][1] = GTK_WIDGET(gtk_builder_get_object(builder, "button_2_1"));
+    buttons[2][2] = GTK_WIDGET(gtk_builder_get_object(builder, "button_2_2"));
     player_label = GTK_WIDGET(gtk_builder_get_object(builder, "player_label"));
 
-    g_signal_connect(
-                     button_0_0,
-                     "clicked",
-                     G_CALLBACK(on_clicked_button),
-                     button_0_0
-                    );
+    struct button_press_arguments arguments[3][3] = {};
 
-    g_signal_connect(
-                     button_0_1,
-                     "clicked",
-                     G_CALLBACK(on_clicked_button),
-                     button_0_1
-                    );
-
-    g_signal_connect(
-                     button_0_2,
-                     "clicked",
-                     G_CALLBACK(on_clicked_button),
-                     button_0_2
-                    );
-
-    g_signal_connect(
-                     button_1_0,
-                     "clicked",
-                     G_CALLBACK(on_clicked_button),
-                     button_1_0
-                    );
-
-    g_signal_connect(
-                     button_1_1,
-                     "clicked",
-                     G_CALLBACK(on_clicked_button),
-                     button_1_1
-                    );
-
-    g_signal_connect(
-                     button_1_2,
-                     "clicked",
-                     G_CALLBACK(on_clicked_button),
-                     button_1_2
-                    );
-
-    g_signal_connect(
-                     button_2_0,
-                     "clicked",
-                     G_CALLBACK(on_clicked_button),
-                     button_2_0
-                    );
-
-    g_signal_connect(
-                     button_2_1,
-                     "clicked",
-                     G_CALLBACK(on_clicked_button),
-                     button_2_1
-                    );
-
-    g_signal_connect(
-                     button_2_2,
-                     "clicked",
-                     G_CALLBACK(on_clicked_button),
-                     button_2_2
-                    );
+    for (i = 0; i < 3; i++) {
+       for (j = 0; j < 3; j++) {
+            arguments[i][j].button = buttons[i][j];
+            arguments[i][j].state_pointer = &game_state[i][j];
+            g_signal_connect(
+                             buttons[i][j],
+                             "clicked",
+                             G_CALLBACK(on_clicked_button),
+                             &arguments[i][j]
+                            );
+       }
+    }
 
     // Show and start main loop
     gtk_widget_show_all(window);
