@@ -1,6 +1,140 @@
 #include <gtk/gtk.h>
 
 
+char check_rows(char (*game_state)[3]){
+    int a;
+    int b;
+    _Bool X_wins[] = {0, 0, 0};
+    _Bool O_wins[] = {0, 0, 0};
+    char current_box;
+
+    for (a = 0; a < 3; a++) {
+        for (b = 0; b < 3; b++) {
+            current_box = *(*(game_state + a) + b);
+
+            if (current_box=='X') {
+                X_wins[b] = 1;
+            } else if (current_box=='O') {
+                O_wins[b] = 1;
+            }
+        }
+    }
+
+    char output_char = ' ';
+
+    if (X_wins[0]&&X_wins[1]&&X_wins[2]) {
+        output_char = 'X';
+    } else if (O_wins[0]&&O_wins[1]&&O_wins[2]) {
+        output_char = 'O';
+    }
+
+    return output_char;
+}
+
+char check_columns(char (*game_state)[3]){
+    int a;
+    int b;
+    _Bool X_wins[] = {0, 0, 0};
+    _Bool O_wins[] = {0, 0, 0};
+    char current_box;
+
+    for (a = 0; a < 3; a++) {
+        for (b = 0; b < 3; b++) {
+            current_box = *(*(game_state + b) + a);
+
+            if (current_box=='X') {
+                X_wins[a] = 1;
+            } else if (current_box=='O') {
+                O_wins[a] = 1;
+            }
+        }
+    }
+
+    char output_char = ' ';
+
+    if (X_wins[0]&&X_wins[1]&&X_wins[2]) {
+        output_char = 'X';
+    } else if (O_wins[0]&&O_wins[1]&&O_wins[2]) {
+        output_char = 'O';
+    }
+
+    return output_char;
+}
+
+char check_first_diagonal(char (*game_state)[3]){
+    int a;
+    _Bool X_wins[] = {0, 0, 0};
+    _Bool O_wins[] = {0, 0, 0};
+    char current_box;
+
+    for (a = 0; a < 3; a++) {
+        current_box = *(*(game_state + a) + a);
+
+        if (current_box=='X') {
+            X_wins[a] = 1;
+        } else if (current_box=='O') {
+            O_wins[a] = 1;
+        }
+    }
+
+    char output_char = ' ';
+
+    if (X_wins[0]&&X_wins[1]&&X_wins[2]) {
+        output_char = 'X';
+    } else if (O_wins[0]&&O_wins[1]&&O_wins[2]) {
+        output_char = 'O';
+    }
+
+    return output_char;
+}
+
+char check_second_diagonal(char (*game_state)[3]){
+    int a;
+    _Bool X_wins[] = {0, 0, 0};
+    _Bool O_wins[] = {0, 0, 0};
+    char current_box;
+
+    for (a = 0; a < 3; a++) {
+        current_box = *(*(game_state + a) + 2-a);
+
+        if (current_box=='X') {
+            X_wins[a] = 1;
+        } else if (current_box=='O') {
+            O_wins[a] = 1;
+        }
+    }
+
+    char output_char = ' ';
+
+    if (X_wins[0]&&X_wins[1]&&X_wins[2]) {
+        output_char = 'X';
+    } else if (O_wins[0]&&O_wins[1]&&O_wins[2]) {
+        output_char = 'O';
+    }
+
+    return output_char;
+}
+
+char check_three_in_line(char (*game_state)[3]){
+    char checking[] = {check_rows(game_state),
+                      check_columns(game_state),
+                      check_first_diagonal(game_state),
+                      check_second_diagonal(game_state)
+                      };
+
+    char output_char = ' ';
+
+    int a;
+
+    for (a = 0; a < 4; a++) {
+        if (checking[a] != ' ') {
+            output_char = checking[a];
+        }
+    }
+
+    return output_char;
+}
+
 struct button_press_arguments {
     GtkWidget *player_label;
     GtkWidget *((*buttons)[3]);
@@ -22,24 +156,17 @@ void on_clicked_button(
   char *current_player = arguments->current_player;
   *(*(game_state + i) + j) = *current_player;
 
-  int a;
-  int b;
+  char winning_player = check_three_in_line(game_state);
 
-  // for (a = 0; a < 3; a++) {
-  //     for (b = 0; b < 3; b++) {
-  //         g_print("%c",*(*(game_state + a) + b));
-  //     }
-  //     g_print("\n");
-  // }
-  // g_print("\n");
+  if (winning_player != ' ') {
+      g_print("%c wins\n",winning_player);
+  }
 
   char state = *current_player;
   GtkLabel *player_label = (GtkLabel*) arguments->player_label;
   char *str;
 
   if (state == 'X') {
-    // g_print("Current player is %c\n",*current_player);
-
     str = g_strdup_printf ("<span font=\"90\" color=\"red\">"
                                  "<b>%s</b>"
                                  "</span>",
@@ -50,8 +177,6 @@ void on_clicked_button(
     *current_player = 'O';
 
   } else if (state == 'O') {
-    // g_print("Current player is %c\n",*current_player);
-
     str = g_strdup_printf ("<span font=\"90\" color=\"blue\">"
                                  "<b>%s</b>"
                                  "</span>",
@@ -71,8 +196,6 @@ void on_clicked_button(
     g_free (str); // remember to free the string allocated by g_strdup_printf()
     gboolean sensitive = FALSE;
     gtk_widget_set_sensitive(widget, sensitive);
-
-    // g_print("%d\n",CLICK);
 }
 
 int main(int argc, char* argv[]) {
