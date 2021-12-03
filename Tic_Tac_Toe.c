@@ -4,8 +4,10 @@
 struct button_press_arguments {
     GtkWidget *player_label;
     GtkWidget *button;
-    char *state_pointer;
+    char (*game_state_pointer)[3];
     char *current_player;
+    int i;
+    int j;
 };
 
 void on_clicked_button(
@@ -13,14 +15,30 @@ void on_clicked_button(
                        struct button_press_arguments *arguments
                       )
 {
+  char (*game_state)[3];
+  game_state = arguments->game_state_pointer;
+  int i = arguments->i;
+  int j = arguments->j;
   char *current_player = arguments->current_player;
-  char *state_pointer = arguments->state_pointer;
-  *state_pointer = *current_player;
+  *(*(game_state + i) + j) = *current_player;
+
+  int a;
+  int b;
+
+  // for (a = 0; a < 3; a++) {
+  //     for (b = 0; b < 3; b++) {
+  //         g_print("%c",*(*(game_state + a) + b));
+  //     }
+  //     g_print("\n");
+  // }
+  // g_print("\n");
+
+  char state = *current_player;
   GtkLabel *player_label = (GtkLabel*) arguments->player_label;
   char *str;
 
-  if (*state_pointer == 'X') {
-    g_print("Current player is %c\n",*current_player);
+  if (state == 'X') {
+    // g_print("Current player is %c\n",*current_player);
 
     str = g_strdup_printf ("<span font=\"90\" color=\"red\">"
                                  "<b>%s</b>"
@@ -31,10 +49,10 @@ void on_clicked_button(
 
     *current_player = 'O';
 
-  } else if (*state_pointer == 'O') {
-    g_print("Current player is %c\n",*current_player);
+  } else if (state == 'O') {
+    // g_print("Current player is %c\n",*current_player);
 
-    str = g_strdup_printf ("<span font=\"90\" color=\"red\">"
+    str = g_strdup_printf ("<span font=\"90\" color=\"blue\">"
                                  "<b>%s</b>"
                                  "</span>",
                                  "O");
@@ -99,8 +117,10 @@ int main(int argc, char* argv[]) {
        for (j = 0; j < 3; j++) {
             arguments[i][j].player_label = player_label;
             arguments[i][j].button = buttons[i][j];
-            arguments[i][j].state_pointer = &game_state[i][j];
+            arguments[i][j].game_state_pointer = game_state;
             arguments[i][j].current_player = &current_player;
+            arguments[i][j].i = i;
+            arguments[i][j].j = j;
             g_signal_connect(
                              buttons[i][j],
                              "clicked",
