@@ -2,8 +2,10 @@
 
 
 struct button_press_arguments {
+    GtkWidget *player_label;
     GtkWidget *button;
-    int *state_pointer;
+    char *state_pointer;
+    char *current_player;
 };
 
 void on_clicked_button(
@@ -11,24 +13,43 @@ void on_clicked_button(
                        struct button_press_arguments *arguments
                       )
 {
-  enum state_definition {
-      NO_CLICK,  // 0
-      CLICK      // 1
-  };
+  char *current_player = arguments->current_player;
+  char *state_pointer = arguments->state_pointer;
+  *state_pointer = *current_player;
+  GtkLabel *player_label = (GtkLabel*) arguments->player_label;
+  char *str;
 
-  char *str = g_strdup_printf ("<span font=\"90\" color=\"red\">"
-                               "<b>%s</b>"
-                               "</span>",
-                               "X");
+  if (*state_pointer == 'X') {
+    g_print("Current player is %c\n",*current_player);
 
-    int *state_pointer = arguments->state_pointer;
-    *state_pointer = CLICK;
+    str = g_strdup_printf ("<span font=\"90\" color=\"red\">"
+                                 "<b>%s</b>"
+                                 "</span>",
+                                 "X");
+
+    gtk_label_set_text(player_label, "Jugador O");
+
+    *current_player = 'O';
+
+  } else if (*state_pointer == 'O') {
+    g_print("Current player is %c\n",*current_player);
+
+    str = g_strdup_printf ("<span font=\"90\" color=\"red\">"
+                                 "<b>%s</b>"
+                                 "</span>",
+                                 "O");
+
+    gtk_label_set_text(player_label, "Jugador X");
+
+    *current_player = 'X';
+
+  }
+
     GtkButton *button = (GtkButton*) arguments->button;
-    GtkLabel *label = (GtkLabel*) gtk_bin_get_child(GTK_BIN(button));
-    gtk_label_set_text(label, "X");
-    gtk_label_set_markup (GTK_LABEL (label), str);
+    GtkLabel *button_label = (GtkLabel*) gtk_bin_get_child(GTK_BIN(button));
+    gtk_label_set_markup (GTK_LABEL (button_label), str);
     g_free (str); // remember to free the string allocated by g_strdup_printf()
-    gboolean sensitive= FALSE;
+    gboolean sensitive = FALSE;
     gtk_widget_set_sensitive(widget, sensitive);
 
     // g_print("%d\n",CLICK);
@@ -40,20 +61,17 @@ int main(int argc, char* argv[]) {
     GtkWidget *buttons[3][3];
     GtkWidget *player_label;
 
-    enum state_definition {
-        NO_CLICK,  // 0
-        CLICK      // 1
-    };
-
-    int game_state[3][3];
+    char game_state[3][3];
     int i;
     int j;
 
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 3; j++) {
-            game_state[i][j] = NO_CLICK;
+            game_state[i][j] = ' ';
         }
     }
+
+    char current_player = 'X';
 
     gtk_init(&argc, &argv);
 
@@ -79,8 +97,10 @@ int main(int argc, char* argv[]) {
 
     for (i = 0; i < 3; i++) {
        for (j = 0; j < 3; j++) {
+            arguments[i][j].player_label = player_label;
             arguments[i][j].button = buttons[i][j];
             arguments[i][j].state_pointer = &game_state[i][j];
+            arguments[i][j].current_player = &current_player;
             g_signal_connect(
                              buttons[i][j],
                              "clicked",
