@@ -149,6 +149,25 @@ char check_three_in_line(char (*game_state)[3]){
     return output_char;
 }
 
+_Bool nobody_wins(char (*game_state)[3]){
+    int a;
+    int b;
+    char current_box;
+    _Bool output_bool = 1;
+
+    for (a = 0; a < 3; a++) {
+        for (b = 0; b < 3; b++) {
+            current_box = *(*(game_state + a) + b);
+
+            if (current_box == ' ') {
+                output_bool = 0;
+            }
+        }
+    }
+
+    return output_bool;
+}
+
 struct button_press_arguments {
     GtkWidget *player_label;
     GtkWidget *((*buttons)[3]);
@@ -249,11 +268,54 @@ void on_clicked_button(
         g_free (str); // remember to free the string allocated by g_strdup_printf()
         gboolean sensitive = FALSE;
         gtk_widget_set_sensitive(widget, sensitive);
+
+        if (nobody_wins(game_state)){
+            gtk_label_set_text(player_label, "Ninguno gana");
+        }
   }
 }
 
-void reset_clicked(GtkWidget *widget, void* nothing){
-    g_print("Test\n");
+void reset_clicked(
+                   GtkWidget *widget,
+                   struct button_press_arguments *arguments
+                  )
+{
+  char (*game_state)[3];
+  game_state = arguments->game_state_pointer;
+  char *current_player = arguments->current_player;
+  *current_player = 'X';
+  GtkWidget *((*buttons)[3]);
+  buttons = arguments->buttons;
+  GtkLabel *player_label = (GtkLabel*) arguments->player_label;
+  gtk_label_set_text(player_label, "Jugador X");
+
+  int a;
+  int b;
+  GtkWidget *button_widget;
+  gboolean sensitive = TRUE;
+  GtkButton *button;
+  GtkLabel *button_label;
+
+  char *str = g_strdup_printf ("<span font=\"90\" color=\"red\">"
+                               "<b>%s</b>"
+                               "</span>",
+                               " ");
+
+  for (a = 0; a < 3; a++) {
+      for (b = 0; b < 3; b++) {
+
+          *(*(game_state + a) + b) = ' ';
+
+          button_widget = *(*(buttons + a) + b);
+          gtk_widget_set_sensitive(button_widget, sensitive);
+
+          button = (GtkButton*) *(*(buttons + a) + b);
+          button_label = (GtkLabel*) gtk_bin_get_child(GTK_BIN(button));
+          gtk_label_set_markup (GTK_LABEL (button_label), str);
+      }
+  }
+
+  g_free (str);
 }
 
 int main(int argc, char* argv[]) {
@@ -332,7 +394,7 @@ int main(int argc, char* argv[]) {
     g_signal_connect(reset_button,
                      "clicked",
                      G_CALLBACK(reset_clicked),
-                     NULL
+                     &arguments[0][0]
                     );
 
     char *str_reset = g_strdup_printf ("<span font=\"20\">"
