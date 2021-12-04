@@ -1,4 +1,5 @@
 #include <gtk/gtk.h>
+#include <stdlib.h>
 
 
 char check_rows(char (*game_state)[3]){
