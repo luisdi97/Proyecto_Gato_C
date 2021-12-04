@@ -296,7 +296,16 @@ int main(int argc, char* argv[]) {
     player_label = GTK_WIDGET(gtk_builder_get_object(builder, "player_label"));
     reset_button = GTK_WIDGET(gtk_builder_get_object(builder, "reset_button"));
 
+    // if (GTK_IS_BIN(reset_button)) {
+    //   g_print("Hola\n");
+    // }
+
     struct button_press_arguments arguments[3][3] = {};
+
+    char *str_button = g_strdup_printf ("<span font=\"90\">"
+                                       "<b>%s</b>"
+                                       "</span>",
+                                       " ");
 
     for (i = 0; i < 3; i++) {
        for (j = 0; j < 3; j++) {
@@ -312,24 +321,28 @@ int main(int argc, char* argv[]) {
                              G_CALLBACK(on_clicked_button),
                              &arguments[i][j]
                             );
+
+            GtkWidget *button_label = gtk_bin_get_child(GTK_BIN(buttons[i][j]));
+            gtk_label_set_markup (GTK_LABEL (button_label), str_button);
        }
     }
 
-g_signal_connect(reset_button,
-                 "clicked",
-                 G_CALLBACK(reset_clicked),
-                 NULL
-                );
+    g_free (str_button); // remember to free the string allocated by g_strdup_printf()
 
-// char *str = g_strdup_printf ("<span font=\"20\">"
-//                              "<b>%s</b>"
-//                              "</span>",
-//                              "O");
-//
-// GtkButton *button = (GtkButton*) &reset_button;
-// GtkLabel *button_label = (GtkLabel*) gtk_bin_get_child(GTK_BIN(button));
-// gtk_label_set_markup (GTK_LABEL (button_label), str);
-// g_free (str); // remember to free the string allocated by g_strdup_printf()
+    g_signal_connect(reset_button,
+                     "clicked",
+                     G_CALLBACK(reset_clicked),
+                     NULL
+                    );
+
+    char *str_reset = g_strdup_printf ("<span font=\"20\">"
+                                       "%s"
+                                       "</span>",
+                                       "Reinicio");
+
+    GtkWidget *reset_label = gtk_bin_get_child(GTK_BIN(reset_button));
+    gtk_label_set_markup (GTK_LABEL (reset_label), str_reset);
+    g_free (str_reset); // remember to free the string allocated by g_strdup_printf()
 
     // Show and start main loop
     gtk_widget_show_all(window);
