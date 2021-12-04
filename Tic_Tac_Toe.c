@@ -65,9 +65,9 @@ char check_columns(char (*game_state)[3]){
 
         output_char = 'X';
 
-    } else if (O_wins[0][0]&&O_wins[1][1]&&O_wins[2][2] ||
+    } else if (O_wins[0][0]&&O_wins[1][0]&&O_wins[2][0] ||
                O_wins[0][1]&&O_wins[1][1]&&O_wins[2][1] ||
-               O_wins[0][2]&&O_wins[1][1]&&O_wins[2][2]) {
+               O_wins[0][2]&&O_wins[1][2]&&O_wins[2][2]) {
 
         output_char = 'O';
     }
