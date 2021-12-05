@@ -17,7 +17,7 @@ computer play against each other sharing a mouse and clicking to position the
 
 char check_rows(char (*game_state)[3]){
     /*
-    This function checks the rown in the 3x3 game array called game_state to
+    This function checks the rows in the 3x3 game array called game_state to
     determine whether three 'X' or 'O' are present. If there's a row with three
     'X' the char 'X' is returned, if there's a row with three 'O' the char 'O'
     is returned, if none of those conditions are met the char ' ' is returned.
@@ -170,7 +170,7 @@ char check_first_diagonal(char (*game_state)[3]){
 char check_second_diagonal(char (*game_state)[3]){
     /*
     This function checks the diagonal starting on top right and ending on
-    botton left in the 3x3 game array called game_state to determine whether
+    bottom left in the 3x3 game array called game_state to determine whether
     three 'X' or 'O' are present. If the diagonal has three 'X' the char 'X' is
     returned, if the diagonal has three 'O' the char 'O' is returned, if none
     of those conditions are met the char ' ' is returned.
@@ -212,7 +212,7 @@ char check_second_diagonal(char (*game_state)[3]){
 
 char check_three_in_line(char (*game_state)[3]){
     /*
-    This functions checks if three 'X' or three 'O' are present in a row,
+    This function checks if three 'X' or three 'O' are present in a row,
     column or diagonal. If three 'X' in line are present the char 'X' is
     returned, if three 'O' in line are present the char 'O' is returned. If
     none of those conditions are met, the char ' ' is returned.
@@ -379,7 +379,7 @@ void on_clicked_button(
         char state = *current_player;
         char *str;
 
-        // Depending of the state a string poiter is created with the char and
+        // Depending of the state a string pointer is created with the char and
         // format. The player label text is changed to the next player and the
         // current player is changed to the next player
 
